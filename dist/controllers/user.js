@@ -9,14 +9,62 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.login = void 0;
+exports.findPatientsCount = exports.createPatient = void 0;
 const utils_1 = require("../utils/utils");
-exports.login = (0, utils_1.asyncMiddleware)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { idToken } = req.body;
-    console.log(idToken);
+const utils_2 = require("../utils/utils");
+const user_1 = require("../functions/user");
+exports.createPatient = (0, utils_2.asyncMiddleware)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { email, phone } = req.body;
     try {
+        const response = yield (0, user_1.createUserPatient)(email, phone);
+        if (!response.success) {
+            return (0, utils_1.sendResponse)(res, {
+                success: false,
+                status: 400,
+                data: null,
+                message: 'User Already Exists'
+            });
+        }
+        const addtoUser = yield (0, user_1.addpatientIdToUser)(req.user.email, response.data._id);
+        if (!addtoUser.success) {
+            return (0, utils_1.sendResponse)(res, {
+                success: false,
+                status: 400,
+                data: null,
+                message: 'User Already Exists'
+            });
+        }
+        return (0, utils_1.sendResponse)(res, {
+            success: true,
+            status: 200,
+            data: response.data,
+            message: 'User Created Successfully'
+        });
     }
     catch (err) {
-        // Handle the error here
+        next(err);
+    }
+}));
+exports.findPatientsCount = (0, utils_2.asyncMiddleware)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    let { email } = req.user;
+    try {
+        let findNumer = yield (0, user_1.findNumberOfPatients)(email);
+        if (!findNumer.data) {
+            return (0, utils_1.sendResponse)(res, {
+                success: false,
+                status: 200,
+                data: null,
+                message: 'No Patients Found'
+            });
+        }
+        return (0, utils_1.sendResponse)(res, {
+            success: true,
+            status: 200,
+            data: findNumer.data,
+            message: 'Patients Found'
+        });
+    }
+    catch (err) {
+        next(err);
     }
 }));

@@ -27,8 +27,8 @@ exports.userSchema = exports.User = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
 const userSchema = new mongoose_1.Schema({
     email: { type: String, required: true, unique: true },
-    name: { type: String, required: true },
-    picture: { type: String, required: true },
+    name: { type: String },
+    picture: { type: String },
     role: { type: String, enum: ["caretaker", "user"], required: true },
     mobile: { type: String },
     patients: [{ type: mongoose_1.Schema.Types.ObjectId, ref: "User" }],

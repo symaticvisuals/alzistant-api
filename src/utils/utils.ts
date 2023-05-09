@@ -18,9 +18,9 @@ const classResponse = (success: boolean, data: any, err: any) => {
 
 const generateJwtToken = (payload: any) => {
     let { name, picture, role, mobile, email } = payload;
-    
+
     const token = jwt.sign(payload, process.env.JWT_SECRET!, {
-        expiresIn: process.env.JWT_EXPIRES_IN!,
+        expiresIn: "30d"
     });
     return classResponse(
         true,
@@ -35,18 +35,22 @@ const generateJwtToken = (payload: any) => {
 };
 
 const verifyJwtToken = async (req: any, res: any, next: any): Promise<any> => {
-    if (!req.headers.authorization) {
-        return res.status(401).json({
-            success: false,
-            data: null,
-            error: "No authorization token",
-        });
-    }
-    const token = req.headers.authorization.split(" ")[1];
+  
     try {
-        req.user = jwt.verify(token, process.env.JWT_SECRET!);
+        if (!req.headers.authorization) {
+            return res.status(401).json({
+                success: false,
+                data: null,
+                error: "No authorization token",
+            });
+        }
+        const token = req.headers.authorization.split(" ")[1];
+        const decoded = jwt.verify(token, process.env.JWT_SECRET!);
+  
+        req.user = decoded;
         next();
     } catch (err) {
+  
         return res.status(401).json({
             success: false,
             data: null,
@@ -133,4 +137,5 @@ export {
     verifyJwtToken,
     generateJwtToken,
     asyncMiddleware,
+    classResponse
 }

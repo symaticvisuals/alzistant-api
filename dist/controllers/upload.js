@@ -37,13 +37,11 @@ const BUCKET_NAME = process.env.S3_BUCKET_NAME;
 const BUCKET_FOLDER = process.env.S3_FOLDER_NAME;
 const storage = multer_2.default.memoryStorage();
 exports.addImage = (0, utils_1.asyncMiddleware)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(req.name);
     try {
         const { photo, name } = yield (0, multer_1.handleFileUpload)(req, res);
         const { buffer, mimetype } = photo;
         const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}`;
         const key = `${BUCKET_FOLDER}/${fileName}`;
-        console.log("name", name);
         const params = {
             Bucket: BUCKET_NAME,
             Key: key,
@@ -79,7 +77,6 @@ exports.verifyImage = (0, utils_1.asyncMiddleware)((req, res, next) => __awaiter
         let name = null;
         let found = false;
         for (const match of response.FaceMatches) {
-            console.log(match.Face.FaceId, match.Face.Confidence);
             const face = yield dynamodb.getItem({
                 TableName: 'face_recognition',
                 Key: { RekognitionId: { S: match.Face.FaceId } },

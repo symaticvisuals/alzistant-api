@@ -7,4 +7,6 @@ router.route('/')
     .post(auth_1.login);
 router.route('/sendOtp')
     .post(auth_1.sendOtp);
+router.route('/verifyOtp')
+    .post(auth_1.verifyOtp);
 exports.default = router;

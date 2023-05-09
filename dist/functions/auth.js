@@ -12,7 +12,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.checkIfEmailExists = void 0;
 const user_1 = require("../schema/user");
 const checkIfEmailExists = (email) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("here");
     const user = yield user_1.User.find({ email: email }).lean()
         .exec();
     if (user.length !== 0) {

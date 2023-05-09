@@ -11,8 +11,8 @@ export interface UserDocument extends Document {
 
 const userSchema = new Schema<UserDocument>({
   email: { type: String, required: true, unique: true },
-  name: { type: String, required: true },
-  picture: { type: String, required: true },
+  name: { type: String },
+  picture: { type: String },
   role: { type: String, enum: ["caretaker", "user"], required: true },
   mobile: { type: String },
   patients: [{ type: Schema.Types.ObjectId, ref: "User" }],

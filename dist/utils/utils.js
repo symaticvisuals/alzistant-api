@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.asyncMiddleware = exports.generateJwtToken = exports.verifyJwtToken = exports.verifyRoles = exports.sendResponse = exports.errorHandler = exports.getMessageBody = void 0;
+exports.classResponse = exports.asyncMiddleware = exports.generateJwtToken = exports.verifyJwtToken = exports.verifyRoles = exports.sendResponse = exports.errorHandler = exports.getMessageBody = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const Constants = require('./Constants');
 const asyncMiddleware = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
@@ -24,10 +24,11 @@ const classResponse = (success, data, err) => {
         err,
     };
 };
+exports.classResponse = classResponse;
 const generateJwtToken = (payload) => {
     let { name, picture, role, mobile, email } = payload;
     const token = jsonwebtoken_1.default.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: process.env.JWT_EXPIRES_IN,
+        expiresIn: "30d"
     });
     return classResponse(true, {
         token: token,
@@ -38,16 +39,17 @@ const generateJwtToken = (payload) => {
 };
 exports.generateJwtToken = generateJwtToken;
 const verifyJwtToken = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    if (!req.headers.authorization) {
-        return res.status(401).json({
-            success: false,
-            data: null,
-            error: "No authorization token",
-        });
-    }
-    const token = req.headers.authorization.split(" ")[1];
     try {
-        req.user = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
+        if (!req.headers.authorization) {
+            return res.status(401).json({
+                success: false,
+                data: null,
+                error: "No authorization token",
+            });
+        }
+        const token = req.headers.authorization.split(" ")[1];
+        const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
+        req.user = decoded;
         next();
     }
     catch (err) {
