@@ -25,13 +25,20 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.userSchema = exports.User = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
+const uuid_1 = require("uuid");
 const userSchema = new mongoose_1.Schema({
+    // auto increment id for user and fill in the id field when creating a new user in the database 
+    id: {
+        type: String, required: true, unique: true, default: uuid_1.v4
+    },
     email: { type: String, required: true, unique: true },
     name: { type: String },
     picture: { type: String },
     role: { type: String, enum: ["caretaker", "user"], required: true },
     mobile: { type: String },
     patients: [{ type: mongoose_1.Schema.Types.ObjectId, ref: "User" }],
+}, {
+    timestamps: true,
 });
 exports.userSchema = userSchema;
 const User = mongoose_1.default.model("User", userSchema);

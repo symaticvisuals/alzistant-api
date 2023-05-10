@@ -1,32 +1,139 @@
-import mongoose, { Document, Schema, Types } from "mongoose";
+import moment from 'moment';
+import mongoose, { Document, Schema } from "mongoose";
 
-export interface PillReminderDocument extends Document {
-  user: Types.ObjectId;
-  caretakerId?: Types.ObjectId;
-  timings: string[];
+interface IPillReminder extends Document {
+  user: string;
+  caretakerId?: string;
+  timings: {
+    time: string;
+    isTaken: boolean;
+    momentTime?: moment.Moment;
+  }[];
   medicineName: string;
   quantity: number;
-  dateToTake: Date;
-  frequency: "daily" | "alternate" | "one-day";
+  startDate: Date;
+  endDate: Date;
+  frequency: "daily" | "one-day" | "alternate";
+  duration: number;
+  category: string;
+  toBeTakenToday: boolean;
+  toBeTakenTomorrow: boolean;
+  lateTime: string[];
 }
 
-const pillReminderSchema = new Schema<PillReminderDocument>({
-  user: { type: Schema.Types.ObjectId, ref: "User", required: true },
-  caretakerId: { type: Schema.Types.ObjectId, ref: "User" },
-  timings: { type: [String], required: true },
+const pillReminderSchema = new Schema<IPillReminder>({
+  user: { type: String, ref: "User", required: true, index: true },
+  caretakerId: { type: String, ref: "User", index: true },
+  timings: [{
+    time: { type: String, required: true },
+    isTaken: { type: Boolean, default: false },
+    momentTime: { type: Schema.Types.Mixed }
+  }],
   medicineName: { type: String, required: true },
   quantity: { type: Number, required: true },
-  dateToTake: { type: Date, required: true },
+  startDate: { type: Date, required: true, index: true },
+  endDate: { type: Date, required: true, index: true },
   frequency: {
     type: String,
-    enum: ["daily", "alternate", "one-day"],
+    enum: ["daily", "one-day", "alternate"],
     required: true,
   },
+  category: { type: String, index: true },
+}, { timestamps: true });
+
+pillReminderSchema.pre('save', function (next) {
+  const pillReminder = this as IPillReminder;
+
+  pillReminder.timings.forEach((timing) => {
+    timing.momentTime = moment(timing.time, 'HH:mm');
+  });
+
+  next();
 });
 
-const PillReminder = mongoose.model<PillReminderDocument>(
+
+pillReminderSchema.virtual("duration").get(function (this: IPillReminder) {
+  const oneDay = 24 * 60 * 60 * 1000; // milliseconds in a day
+  const durationInDays = Math.round(
+    Math.abs((this.endDate.getTime() - this.startDate.getTime()) / oneDay)
+  );
+  if (this.frequency === "daily") {
+    return durationInDays;
+  } else if (this.frequency === "one-day") {
+    return 1;
+  } else {
+    // If the frequency is alternate, we need to add one extra day to the duration if the
+    // duration is an odd number, to account for the extra day in the alternating schedule.
+    const duration = Math.ceil(durationInDays / 2);
+    return duration % 2 === 0 ? duration : duration + 1;
+  }
+});
+
+
+
+pillReminderSchema.virtual('toBeTakenToday').get(function (this: IPillReminder) {
+  const now = moment();
+  const isDaily = this.frequency === 'daily';
+  const isBeforeEndDate = now.isSameOrBefore(moment(this.endDate));
+  const isAfterStartDate = now.isSameOrAfter(moment(this.startDate));
+  if (isDaily && isBeforeEndDate && isAfterStartDate) {
+    return true;
+  } else if (this.frequency === 'one-day' && now.isSame(moment(this.startDate), 'day')) {
+    return true;
+  } else if (this.frequency === 'alternate') {
+    const diffDays = now.diff(moment(this.startDate), 'days');
+    return diffDays % 2 === 0;
+  } else {
+    return false;
+  }
+});
+
+pillReminderSchema.virtual('toBeTakenTomorrow').get(function (this: IPillReminder) {
+  const now = moment();
+  const tomorrow = moment().add(1, 'day');
+  const isDaily = this.frequency === 'daily';
+  const isBeforeEndDate = tomorrow.isSameOrBefore(moment(this.endDate));
+  if (isDaily && isBeforeEndDate) {
+    const tomorrowString = tomorrow.format('YYYY-MM-DD');
+    return this.timings.some(timing => {
+      const reminderTimeString = `${tomorrowString} ${timing.time}`;
+      const reminderTime = moment(reminderTimeString, 'YYYY-MM-DD HH:mm');
+      return reminderTime.isAfter(now);
+    });
+  } else if (this.frequency === 'one-day' && tomorrow.isSame(moment(this.startDate), 'day')) {
+    return true;
+  } else if (this.frequency === 'alternate') {
+    const diffDays = tomorrow.diff(moment(this.startDate), 'days');
+    return diffDays % 2 === 0;
+  } else {
+    return false;
+  }
+});
+
+pillReminderSchema.virtual('lateTime').get(function () {
+  const now = moment();
+  const isLate = [];
+
+  this.timings = this.timings.filter((timing) => {
+    const timingMoment = moment(timing.time, 'HH:mm');
+
+    if (!timing.isTaken && moment.duration(now.diff(timingMoment)).asMinutes() >= 10) {
+      isLate.push(timing);
+      return false; // Remove the late timing from the timings array
+    }
+
+    return true; // Keep the timing in the timings array
+  });
+
+  return isLate;
+});
+
+
+
+
+const PillReminder = mongoose.model<IPillReminder>(
   "PillReminder",
-  pillReminderSchema
+  pillReminderSchema,
 );
 
-export { PillReminder, pillReminderSchema };
+export { PillReminder, pillReminderSchema, IPillReminder };

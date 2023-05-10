@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.findNumberOfPatients = exports.syncUserData = exports.addpatientIdToUser = exports.createUserPatient = exports.create = void 0;
+exports.findPatientId = exports.findNumberOfPatients = exports.syncUserData = exports.addpatientIdToUser = exports.createUserPatient = exports.create = void 0;
 const user_1 = require("../schema/user");
 const utils_1 = require("../utils/utils");
 const create = (user, phoneNumber) => __awaiter(void 0, void 0, void 0, function* () {
@@ -71,3 +71,11 @@ const findNumberOfPatients = (email) => __awaiter(void 0, void 0, void 0, functi
     return (0, utils_1.classResponse)(true, user.patients.length, null);
 });
 exports.findNumberOfPatients = findNumberOfPatients;
+const findPatientId = (email) => __awaiter(void 0, void 0, void 0, function* () {
+    let findUser = yield user_1.User.findOne({ email }).populate('patients').exec();
+    return (0, utils_1.classResponse)(true, {
+        patientId: findUser.patients[0].id,
+        caretakerId: findUser.id
+    }, null);
+});
+exports.findPatientId = findPatientId;

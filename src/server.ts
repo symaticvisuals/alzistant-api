@@ -5,6 +5,7 @@ import cors from 'cors'
 import { errorHandler } from './utils/utils';
 import routes from './routes';
 import { connectDbMiddleware } from './db/connection';
+import { cronJob } from './services/cron';
 
 
 dotenv.config();
@@ -19,6 +20,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(connectDbMiddleware());
 
+// add cron job here
 
 
 routes.forEach((route) => {
@@ -32,5 +34,6 @@ app.get('/heartbeat', (req, res) => {
 app.use(errorHandler);
 
 app.listen(port, () => {
+    cronJob();
     console.log(`[Server]: I am running at https://localhost:${port}`);
 });

@@ -72,7 +72,17 @@ const findNumberOfPatients = async (email: string) => {
     return classResponse(true, user.patients.length, null);
 }
 
+const findPatientId = async (email: string) => {
+    let findUser = await User.findOne({ email }).populate('patients').exec();
+
+
+    return classResponse(true, {
+        patientId: findUser.patients[0].id,
+        caretakerId: findUser.id
+    }, null);
+}
 
 
 
-export { create, createUserPatient, addpatientIdToUser, syncUserData, findNumberOfPatients };
+
+export { create, createUserPatient, addpatientIdToUser, syncUserData, findNumberOfPatients, findPatientId };

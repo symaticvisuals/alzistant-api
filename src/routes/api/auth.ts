@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { RequestHandler } from 'express-serve-static-core';
 import { login, sendOtp, verifyOtp } from '../../controllers/auth';
-import { verifyJwtToken } from '../../utils/utils';
+
 
 const router = Router();
 
