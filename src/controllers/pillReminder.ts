@@ -50,17 +50,27 @@ export const getByUserId = asyncMiddleware(async (req: any, res: Response, next:
 export const updateIsTaken = asyncMiddleware(async (req: any, res: Response, next: NextFunction) => {
     const { reminderId, timingId } = req.body;
     try {
-        const update = await PillReminder.findOneAndUpdate({
-            _id: reminderId,
-            "timings._id": timingId
-        }, {
-            $set: {
-                "timings.$.isTaken": true
-            }
-        }, {
-            new: true
-        });
-
+        console.log(reminderId, timingId);
+        const reminder = await PillReminder.findOne({ _id: reminderId });
+        if (!reminder) {
+            return sendResponse(res, {
+                status: 404,
+                success: false,
+                data: null,
+                error: 'Reminder not found'
+            });
+        }
+        const timing = reminder.timings.find((t: any) => t._id.toString() === timingId);
+        if (!timing) {
+            return sendResponse(res, {
+                status: 404,
+                success: false,
+                data: null,
+                error: 'Timing not found'
+            });
+        }
+        timing.isTaken = true;
+        const update = await reminder.save();
         return sendResponse(res, {
             status: 200,
             success: true,

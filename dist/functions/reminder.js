@@ -89,7 +89,9 @@ const getRemindersToTake = (email) => __awaiter(void 0, void 0, void 0, function
         var _a;
         const reminderData = {
             medicineName: reminder.medicineName,
-            lateTime: (_a = reminder.lateTime) === null || _a === void 0 ? void 0 : _a.map((timing) => timing.time),
+            lateTime: (_a = reminder.lateTime) === null || _a === void 0 ? void 0 : _a.map((timing) => {
+                return { time: timing.time, isTaken: timing.isTaken, _id: timing._id, momentTime: timing.momentTime };
+            }),
             quantity: reminder.quantity
         };
         return reminderData;
@@ -114,6 +116,7 @@ const getRemindersToTake = (email) => __awaiter(void 0, void 0, void 0, function
             const diff = time.diff(now, 'minutes');
             if (diff <= 45 && diff >= -10 && !timing.isTaken) {
                 nowReminders.push({
+                    _id: reminder._id,
                     medicineName: reminder.medicineName,
                     time: timing,
                     quantity: reminder.quantity

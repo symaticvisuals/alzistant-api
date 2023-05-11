@@ -56,16 +56,27 @@ exports.getByUserId = (0, utils_1.asyncMiddleware)((req, res, next) => __awaiter
 exports.updateIsTaken = (0, utils_1.asyncMiddleware)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { reminderId, timingId } = req.body;
     try {
-        const update = yield pillReminder_1.PillReminder.findOneAndUpdate({
-            _id: reminderId,
-            "timings._id": timingId
-        }, {
-            $set: {
-                "timings.$.isTaken": true
-            }
-        }, {
-            new: true
-        });
+        console.log(reminderId, timingId);
+        const reminder = yield pillReminder_1.PillReminder.findOne({ _id: reminderId });
+        if (!reminder) {
+            return (0, utils_1.sendResponse)(res, {
+                status: 404,
+                success: false,
+                data: null,
+                error: 'Reminder not found'
+            });
+        }
+        const timing = reminder.timings.find((t) => t._id.toString() === timingId);
+        if (!timing) {
+            return (0, utils_1.sendResponse)(res, {
+                status: 404,
+                success: false,
+                data: null,
+                error: 'Timing not found'
+            });
+        }
+        timing.isTaken = true;
+        const update = yield reminder.save();
         return (0, utils_1.sendResponse)(res, {
             status: 200,
             success: true,

@@ -118,7 +118,9 @@ const getRemindersToTake = async (email: string) => {
     }).map((reminder: any) => {
         const reminderData = {
             medicineName: reminder.medicineName,
-            lateTime: reminder.lateTime?.map((timing: any) => timing.time),
+            lateTime: reminder.lateTime?.map((timing: any) => {
+                return { time: timing.time, isTaken: timing.isTaken, _id: timing._id, momentTime: timing.momentTime };
+            }),
             quantity: reminder.quantity
         };
         return reminderData;
@@ -145,7 +147,9 @@ const getRemindersToTake = async (email: string) => {
             const time = moment(timing, 'HH:mm');
             const diff = time.diff(now, 'minutes');
             if (diff <= 45 && diff >= -10 && !timing.isTaken) {
+
                 nowReminders.push({
+                    _id: reminder._id,
                     medicineName: reminder.medicineName,
                     time: timing,
                     quantity: reminder.quantity

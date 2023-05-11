@@ -118,6 +118,7 @@ pillReminderSchema.virtual('lateTime').get(function () {
     const timingMoment = moment(timing.time, 'HH:mm');
 
     if (!timing.isTaken && moment.duration(now.diff(timingMoment)).asMinutes() >= 10) {
+      // also add the date on which the timing is late
       isLate.push(timing);
       return false; // Remove the late timing from the timings array
     }
