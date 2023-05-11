@@ -126,6 +126,8 @@ const getRemindersToTake = async (email: string) => {
         return reminderData;
     });
 
+
+
     let todayReminders = response.filter((reminder: any) => {
         return reminder.toBeTakenToday && reminder.timings.length > 0;
     }).map((reminder: any) => {
