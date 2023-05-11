@@ -68,6 +68,7 @@ const syncUserData = async (user: any) => {
 
 const findNumberOfPatients = async (email: string) => {
     let findUser = User.findOne({ email });
+
     const user = await findUser.exec();
     return classResponse(true, user.patients.length, null);
 }

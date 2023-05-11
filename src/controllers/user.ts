@@ -18,9 +18,9 @@ export const createPatient = asyncMiddleware(
                     message: 'User Already Exists'
                 });
             }
-          
+
             const addtoUser = await addpatientIdToUser(req.user.email, response.data._id);
-          
+
 
             if (!addtoUser.success) {
                 return sendResponse(res, {
