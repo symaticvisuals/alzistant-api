@@ -111,7 +111,7 @@ pillReminderSchema.virtual('toBeTakenTomorrow').get(function (this: IPillReminde
 });
 
 pillReminderSchema.virtual('lateTime').get(function () {
-  const now = moment();
+  const now = moment().utcOffset("+05:30");
   const isLate = [];
 
   this.timings = this.timings.filter((timing) => {

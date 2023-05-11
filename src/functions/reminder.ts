@@ -160,6 +160,9 @@ const getRemindersToTake = async (email: string) => {
         })
     });
 
+    console.log(moment())
+    console.log(moment.tz.guess())
+
 
     return classResponse(true, { lateReminders, todayReminders, nowReminders, tomorrowReminders }, null);
 };
