@@ -1,4 +1,6 @@
-import moment from 'moment';
+import moment from "moment-timezone";
+moment.tz.setDefault("Asia/Kolkata");
+
 import mongoose, { Document, Schema } from "mongoose";
 
 interface IPillReminder extends Document {
@@ -20,6 +22,8 @@ interface IPillReminder extends Document {
   toBeTakenTomorrow: boolean;
   lateTime: string[];
 }
+
+
 
 const pillReminderSchema = new Schema<IPillReminder>({
   user: { type: String, ref: "User", required: true, index: true },
@@ -45,7 +49,8 @@ pillReminderSchema.pre('save', function (next) {
   const pillReminder = this as IPillReminder;
 
   pillReminder.timings.forEach((timing) => {
-    timing.momentTime = moment(timing.time, 'HH:mm');
+    const momentTime = moment.tz(`${pillReminder.startDate.toISOString().substring(0, 10)}T${timing.time}:00.000Z`, 'Asia/Kolkata');
+    timing.momentTime = momentTime;
   });
 
   next();
@@ -97,7 +102,7 @@ pillReminderSchema.virtual('toBeTakenTomorrow').get(function (this: IPillReminde
     const tomorrowString = tomorrow.format('YYYY-MM-DD');
     return this.timings.some(timing => {
       const reminderTimeString = `${tomorrowString} ${timing.time}`;
-      const reminderTime = moment(reminderTimeString, 'YYYY-MM-DD HH:mm');
+      const reminderTime = moment.tz(reminderTimeString, 'YYYY-MM-DD HH:mm', 'Asia/Kolkata');
       return reminderTime.isAfter(now);
     });
   } else if (this.frequency === 'one-day' && tomorrow.isSame(moment(this.startDate), 'day')) {
@@ -111,11 +116,11 @@ pillReminderSchema.virtual('toBeTakenTomorrow').get(function (this: IPillReminde
 });
 
 pillReminderSchema.virtual('lateTime').get(function () {
-  const now = moment().utcOffset("+05:30");
+  const now = moment.tz('Asia/Kolkata');
   const isLate = [];
 
   this.timings = this.timings.filter((timing) => {
-    const timingMoment = moment(timing.time, 'HH:mm');
+    const timingMoment = moment.tz(timing.time, 'HH:mm', 'Asia/Kolkata');
 
     if (!timing.isTaken && moment.duration(now.diff(timingMoment)).asMinutes() >= 10) {
       // also add the date on which the timing is late
@@ -128,7 +133,6 @@ pillReminderSchema.virtual('lateTime').get(function () {
 
   return isLate;
 });
-
 
 
 

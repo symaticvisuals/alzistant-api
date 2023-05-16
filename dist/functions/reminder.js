@@ -124,6 +124,8 @@ const getRemindersToTake = (email) => __awaiter(void 0, void 0, void 0, function
             }
         });
     });
+    console.log((0, moment_1.default)());
+    console.log(moment_1.default.tz.guess());
     return (0, utils_1.classResponse)(true, { lateReminders, todayReminders, nowReminders, tomorrowReminders }, null);
 });
 exports.getRemindersToTake = getRemindersToTake;

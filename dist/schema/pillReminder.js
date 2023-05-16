@@ -27,7 +27,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.pillReminderSchema = exports.PillReminder = void 0;
-const moment_1 = __importDefault(require("moment"));
+const moment_timezone_1 = __importDefault(require("moment-timezone"));
+moment_timezone_1.default.tz.setDefault("Asia/Kolkata");
 const mongoose_1 = __importStar(require("mongoose"));
 const pillReminderSchema = new mongoose_1.Schema({
     user: { type: String, ref: "User", required: true, index: true },
@@ -52,7 +53,8 @@ exports.pillReminderSchema = pillReminderSchema;
 pillReminderSchema.pre('save', function (next) {
     const pillReminder = this;
     pillReminder.timings.forEach((timing) => {
-        timing.momentTime = (0, moment_1.default)(timing.time, 'HH:mm');
+        const momentTime = moment_timezone_1.default.tz(`${pillReminder.startDate.toISOString().substring(0, 10)}T${timing.time}:00.000Z`, 'Asia/Kolkata');
+        timing.momentTime = momentTime;
     });
     next();
 });
@@ -73,18 +75,18 @@ pillReminderSchema.virtual("duration").get(function () {
     }
 });
 pillReminderSchema.virtual('toBeTakenToday').get(function () {
-    const now = (0, moment_1.default)();
+    const now = (0, moment_timezone_1.default)();
     const isDaily = this.frequency === 'daily';
-    const isBeforeEndDate = now.isSameOrBefore((0, moment_1.default)(this.endDate));
-    const isAfterStartDate = now.isSameOrAfter((0, moment_1.default)(this.startDate));
+    const isBeforeEndDate = now.isSameOrBefore((0, moment_timezone_1.default)(this.endDate));
+    const isAfterStartDate = now.isSameOrAfter((0, moment_timezone_1.default)(this.startDate));
     if (isDaily && isBeforeEndDate && isAfterStartDate) {
         return true;
     }
-    else if (this.frequency === 'one-day' && now.isSame((0, moment_1.default)(this.startDate), 'day')) {
+    else if (this.frequency === 'one-day' && now.isSame((0, moment_timezone_1.default)(this.startDate), 'day')) {
         return true;
     }
     else if (this.frequency === 'alternate') {
-        const diffDays = now.diff((0, moment_1.default)(this.startDate), 'days');
+        const diffDays = now.diff((0, moment_timezone_1.default)(this.startDate), 'days');
         return diffDays % 2 === 0;
     }
     else {
@@ -92,23 +94,23 @@ pillReminderSchema.virtual('toBeTakenToday').get(function () {
     }
 });
 pillReminderSchema.virtual('toBeTakenTomorrow').get(function () {
-    const now = (0, moment_1.default)();
-    const tomorrow = (0, moment_1.default)().add(1, 'day');
+    const now = (0, moment_timezone_1.default)();
+    const tomorrow = (0, moment_timezone_1.default)().add(1, 'day');
     const isDaily = this.frequency === 'daily';
-    const isBeforeEndDate = tomorrow.isSameOrBefore((0, moment_1.default)(this.endDate));
+    const isBeforeEndDate = tomorrow.isSameOrBefore((0, moment_timezone_1.default)(this.endDate));
     if (isDaily && isBeforeEndDate) {
         const tomorrowString = tomorrow.format('YYYY-MM-DD');
         return this.timings.some(timing => {
             const reminderTimeString = `${tomorrowString} ${timing.time}`;
-            const reminderTime = (0, moment_1.default)(reminderTimeString, 'YYYY-MM-DD HH:mm');
+            const reminderTime = moment_timezone_1.default.tz(reminderTimeString, 'YYYY-MM-DD HH:mm', 'Asia/Kolkata');
             return reminderTime.isAfter(now);
         });
     }
-    else if (this.frequency === 'one-day' && tomorrow.isSame((0, moment_1.default)(this.startDate), 'day')) {
+    else if (this.frequency === 'one-day' && tomorrow.isSame((0, moment_timezone_1.default)(this.startDate), 'day')) {
         return true;
     }
     else if (this.frequency === 'alternate') {
-        const diffDays = tomorrow.diff((0, moment_1.default)(this.startDate), 'days');
+        const diffDays = tomorrow.diff((0, moment_timezone_1.default)(this.startDate), 'days');
         return diffDays % 2 === 0;
     }
     else {
@@ -116,11 +118,11 @@ pillReminderSchema.virtual('toBeTakenTomorrow').get(function () {
     }
 });
 pillReminderSchema.virtual('lateTime').get(function () {
-    const now = (0, moment_1.default)();
+    const now = moment_timezone_1.default.tz('Asia/Kolkata');
     const isLate = [];
     this.timings = this.timings.filter((timing) => {
-        const timingMoment = (0, moment_1.default)(timing.time, 'HH:mm');
-        if (!timing.isTaken && moment_1.default.duration(now.diff(timingMoment)).asMinutes() >= 10) {
+        const timingMoment = moment_timezone_1.default.tz(timing.time, 'HH:mm', 'Asia/Kolkata');
+        if (!timing.isTaken && moment_timezone_1.default.duration(now.diff(timingMoment)).asMinutes() >= 10) {
             // also add the date on which the timing is late
             isLate.push(timing);
             return false; // Remove the late timing from the timings array
