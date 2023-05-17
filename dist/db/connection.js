@@ -44,9 +44,7 @@ function connectDbMiddleware(options = {}) {
                 .listCollections({ name: collectionName })
                 .hasNext();
             if (!collectionExists) {
-                console.log(`Creating ${collectionName} collection...`);
                 yield mongoose_1.default.connection.createCollection(collectionName);
-                console.log(`Created ${collectionName} collection.`);
             }
         }
     }));

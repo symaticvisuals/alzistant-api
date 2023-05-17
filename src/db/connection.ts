@@ -39,9 +39,9 @@ export default function connectDbMiddleware(options: ConnectOptions = {}) {
         .hasNext();
 
       if (!collectionExists) {
-        console.log(`Creating ${collectionName} collection...`);
+        
         await mongoose.connection.createCollection(collectionName);
-        console.log(`Created ${collectionName} collection.`);
+        
       }
     }
   });

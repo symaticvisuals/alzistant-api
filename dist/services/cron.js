@@ -21,7 +21,6 @@ const updateIsTaken = () => __awaiter(void 0, void 0, void 0, function* () {
     const reminders = yield pillReminder_1.PillReminder.find({
         endDate: { $gte: now.toDate() }
     });
-    console.log(reminders.length);
     reminders.forEach((reminder) => {
         reminder.timings.forEach((timing) => {
             if (timing.isTaken && reminder.toBeTakenToday) {

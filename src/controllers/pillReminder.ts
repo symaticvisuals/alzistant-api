@@ -50,7 +50,7 @@ export const getByUserId = asyncMiddleware(async (req: any, res: Response, next:
 export const updateIsTaken = asyncMiddleware(async (req: any, res: Response, next: NextFunction) => {
     const { reminderId, timingId } = req.body;
     try {
-        console.log(reminderId, timingId);
+      
         const reminder = await PillReminder.findOne({ _id: reminderId });
         if (!reminder) {
             return sendResponse(res, {

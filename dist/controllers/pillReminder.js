@@ -56,7 +56,6 @@ exports.getByUserId = (0, utils_1.asyncMiddleware)((req, res, next) => __awaiter
 exports.updateIsTaken = (0, utils_1.asyncMiddleware)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { reminderId, timingId } = req.body;
     try {
-        console.log(reminderId, timingId);
         const reminder = yield pillReminder_1.PillReminder.findOne({ _id: reminderId });
         if (!reminder) {
             return (0, utils_1.sendResponse)(res, {

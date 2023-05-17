@@ -24,8 +24,6 @@ const handleFileUpload = (req, res) => {
             else {
                 const photo = req.file;
                 const name = req.body.name;
-                console.log(name);
-                console.log(photo);
                 resolve({ photo, name });
             }
         });

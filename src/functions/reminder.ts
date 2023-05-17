@@ -42,7 +42,7 @@ const findRemidners = async (email: string) => {
     });
 
     const reminders = await findRemidners.exec(); // Await the query execution
-    console.log(reminders);
+
     if (reminders.length === 0) {
         return classResponse(false, null, 'No reminders found');
     }
@@ -160,8 +160,7 @@ const getRemindersToTake = async (email: string) => {
         })
     });
 
-    console.log(moment())
-    console.log(moment.tz.guess())
+
 
 
     return classResponse(true, { lateReminders, todayReminders, nowReminders, tomorrowReminders }, null);

@@ -38,7 +38,6 @@ const findRemidners = (email) => __awaiter(void 0, void 0, void 0, function* () 
         endDate: { $gte: now.toDate() }
     });
     const reminders = yield findRemidners.exec(); // Await the query execution
-    console.log(reminders);
     if (reminders.length === 0) {
         return (0, utils_1.classResponse)(false, null, 'No reminders found');
     }
@@ -124,8 +123,6 @@ const getRemindersToTake = (email) => __awaiter(void 0, void 0, void 0, function
             }
         });
     });
-    console.log((0, moment_1.default)());
-    console.log(moment_1.default.tz.guess());
     return (0, utils_1.classResponse)(true, { lateReminders, todayReminders, nowReminders, tomorrowReminders }, null);
 });
 exports.getRemindersToTake = getRemindersToTake;

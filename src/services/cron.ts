@@ -11,7 +11,7 @@ const updateIsTaken = async () => {
     const reminders = await PillReminder.find({
         endDate: { $gte: now.toDate() }
     });
-    console.log(reminders.length);
+
     reminders.forEach((reminder) => {
         reminder.timings.forEach((timing) => {
             if (timing.isTaken && reminder.toBeTakenToday) {

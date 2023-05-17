@@ -33,8 +33,6 @@ const handleFileUpload = (req: any, res: Response): Promise<FileUploadResult> =>
             } else {
                 const photo = req.file as UploadedPhoto;
                 const name = req.body.name as string;
-                console.log(name);
-                console.log(photo);
                 resolve({ photo, name });
             }
         });
