@@ -70,7 +70,10 @@ exports.sendOtp = (0, utils_1.asyncMiddleware)((req, res, next) => __awaiter(voi
     const { phoneNumber } = req.body;
     try {
         const send = yield (0, redis_1.generateOTP)(phoneNumber);
-        console.log(send);
+        if (!send.success) {
+            return (0, utils_1.sendResponse)(res, { success: false, message: 'OTP Sending Failed', status: 400 });
+        }
+        console.log(send.data);
         (0, utils_1.sendResponse)(res, { success: true, message: 'OTP Sent Successfully', status: 200 });
     }
     catch (err) {

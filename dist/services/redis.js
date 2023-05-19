@@ -38,11 +38,11 @@ function generateOTP(phoneNumber) {
                 from: process.env.TWILIO_PHONE_NUMBER,
                 to: `+91${phoneNumber}`,
             });
+            return (0, utils_1.classResponse)(true, otp, null);
         }
         catch (err) {
-            (0, utils_1.classResponse)(false, 'OTP not sent', err);
+            return (0, utils_1.classResponse)(false, 'OTP not sent', err);
         }
-        return otp;
     });
 }
 exports.generateOTP = generateOTP;

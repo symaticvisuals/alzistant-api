@@ -7,7 +7,7 @@ redis.on('connect', function () {
     console.log('Redis client connected');
 });
 
-async function generateOTP(phoneNumber: string): Promise<string> {
+async function generateOTP(phoneNumber: string): Promise<any> {
     // Generate random 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
@@ -25,14 +25,21 @@ async function generateOTP(phoneNumber: string): Promise<string> {
             from: process.env.TWILIO_PHONE_NUMBER!, // Replace with your Twilio phone number
             to: `+91${phoneNumber}`,
         });
+
+        return classResponse(
+            true,
+            otp,
+            null,
+        )
+
+
     } catch (err) {
-        classResponse(
+        return classResponse(
             false,
             'OTP not sent',
             err,
         )
     }
-    return otp;
 }
 
 

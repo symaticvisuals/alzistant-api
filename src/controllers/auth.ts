@@ -71,7 +71,11 @@ export const sendOtp = asyncMiddleware(
     const { phoneNumber } = req.body;
     try {
       const send = await generateOTP(phoneNumber);
-      console.log(send);
+      if (!send.success) {
+        return sendResponse(res, { success: false, message: 'OTP Sending Failed', status: 400 })
+      }
+
+      console.log(send.data);
       sendResponse(res, { success: true, message: 'OTP Sent Successfully', status: 200 })
     } catch (err) {
       next(err);
