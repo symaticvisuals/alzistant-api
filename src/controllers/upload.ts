@@ -109,10 +109,9 @@ export const storeRelativeImage = (photo: any, user: string): Promise<ClassRespo
 const findRelativeById = async (id: string) => {
   console.log('Finding relative by ID:', id);
   try {
-    const relative = await Relative.findById({
-      _id: id,
-    });
-    console.log('Found relative:', relative);
+    const relative = await Relative.findOne({ patientId: id }).select('patientId');
+
+
     if (relative) {
       return relative;
     }
@@ -160,12 +159,13 @@ export const verifyImage = asyncMiddleware(async (req: Request, res: Response, n
       res.status(200).json({ success: false, data: null, error: null });
       return;
     }
-    console.log('Person recognized:', typeof personDetails);
+    console.log('Person recognized:', personDetails);
 
     personDetails = JSON.parse(personDetails);
 
     if (personDetails?.id !== undefined) {
-      const relative = await findRelativeById(personDetails.id);
+      console.log('Person found in database:', personDetails);
+      const relative = await findRelativeById(personDetails.patientId);
 
       if (!relative) {
         console.log('Relative not found');
