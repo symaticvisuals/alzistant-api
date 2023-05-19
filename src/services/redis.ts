@@ -12,10 +12,10 @@ async function generateOTP(phoneNumber: string): Promise<string> {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
     // Store OTP in Redis with a TTL of 5 minutes
-    if (phoneNumber === '1234567890') {
-        await redis.set(`otp:${phoneNumber}`, '123456', "EX", 300);
-        return '123456'
-    }
+    // if (phoneNumber === '1234567890') {
+    //     await redis.set(`otp:${phoneNumber}`, '123456', "EX", 300);
+    //     return '123456'
+    // }
     await redis.set(`otp:${phoneNumber}`, otp, "EX", 300);
 
     // Send OTP to phone number using Twilio API
