@@ -1,10 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ERRORS = exports.SUCCESS = exports.ROLES = exports.SUPER_ADMIN = exports.USER = exports.ADMIN = void 0;
-exports.ADMIN = "admin";
+exports.ERRORS = exports.SUCCESS = exports.ROLES = exports.CARETAKER = exports.USER = void 0;
 exports.USER = "user";
-exports.SUPER_ADMIN = "superadmin";
-exports.ROLES = [exports.ADMIN, exports.USER, exports.SUPER_ADMIN];
+exports.CARETAKER = "caretaker";
+exports.ROLES = [exports.USER, exports.CARETAKER];
 exports.SUCCESS = {
     USER_ADDED: "User added successfully",
     USER_DELETED: "User deleted successfully",

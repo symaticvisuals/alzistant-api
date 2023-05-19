@@ -33,6 +33,7 @@ exports.createReminder = createReminder;
 const findRemidners = (email) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield (0, user_1.findPatientId)(email);
     const now = (0, moment_1.default)();
+    console.log("user", user);
     const findRemidners = pillReminder_1.PillReminder.find({
         user: user.data.patientId,
         endDate: { $gte: now.toDate() }
@@ -49,14 +50,28 @@ const findRemidners = (email) => __awaiter(void 0, void 0, void 0, function* () 
     return (0, utils_1.classResponse)(true, response, null);
 });
 exports.findRemidners = findRemidners;
-const getRemindersToTake = (email) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = yield (0, user_1.findPatientId)(email);
+const fetchReminders = (role, email, id) => __awaiter(void 0, void 0, void 0, function* () {
+    if (role === "caretaker") {
+        const user = yield (0, user_1.findPatientId)(email);
+        const now = (0, moment_1.default)();
+        const findRemidners = yield pillReminder_1.PillReminder.find({
+            user: user.data.patientId,
+            endDate: { $gte: now.toDate() }
+        });
+        return findRemidners; // Await the query execution
+    }
+    else {
+        const now = (0, moment_1.default)();
+        const findRemidners = yield pillReminder_1.PillReminder.find({
+            user: id,
+            endDate: { $gte: now.toDate() }
+        });
+        return findRemidners; // Await the query execution
+    }
+});
+const getRemindersToTake = (email, role, id) => __awaiter(void 0, void 0, void 0, function* () {
     const now = (0, moment_1.default)();
-    const findRemidners = pillReminder_1.PillReminder.find({
-        user: user.data.patientId,
-        endDate: { $gte: now.toDate() }
-    });
-    const reminders = yield findRemidners.exec(); // Await the query execution
+    const reminders = yield fetchReminders(role, email, id); // Await the query execution
     if (reminders.length === 0) {
         return (0, utils_1.classResponse)(false, null, 'No reminders found');
     }

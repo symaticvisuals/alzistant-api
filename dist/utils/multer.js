@@ -24,7 +24,8 @@ const handleFileUpload = (req, res) => {
             else {
                 const photo = req.file;
                 const name = req.body.name;
-                resolve({ photo, name });
+                const relationship = req.body.relationship;
+                resolve({ photo, name, relationship });
             }
         });
     });

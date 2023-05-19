@@ -32,8 +32,7 @@ export const create = asyncMiddleware(async (req: any, res: Response, next: Next
 export const getByUserId = asyncMiddleware(async (req: any, res: Response, next: NextFunction) => {
     const user = req.user;
     try {
-
-        const categorize = await getRemindersToTake(user.email);
+        const categorize = await getRemindersToTake(user.email, user.role, user.id);
 
         return sendResponse(res, {
             status: 200,
@@ -41,6 +40,7 @@ export const getByUserId = asyncMiddleware(async (req: any, res: Response, next:
             data: categorize.data,
             error: categorize.err
         })
+
 
     } catch (error) {
         next(error);
@@ -50,7 +50,7 @@ export const getByUserId = asyncMiddleware(async (req: any, res: Response, next:
 export const updateIsTaken = asyncMiddleware(async (req: any, res: Response, next: NextFunction) => {
     const { reminderId, timingId } = req.body;
     try {
-      
+
         const reminder = await PillReminder.findOne({ _id: reminderId });
         if (!reminder) {
             return sendResponse(res, {

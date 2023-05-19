@@ -29,7 +29,7 @@ export const login = asyncMiddleware(
         user.name = profile.name;
         user.picture = profile.photoUrl;
         const syncData = await syncUserData(user);
-       
+
         let data = {
           name: syncData.data.name,
           email: syncData.data.email,
@@ -67,6 +67,7 @@ export const login = asyncMiddleware(
 
 export const sendOtp = asyncMiddleware(
   async (req: Request, res: Response, next: NextFunction) => {
+    console.log("here")
     const { phoneNumber } = req.body;
     try {
       const send = await generateOTP(phoneNumber);

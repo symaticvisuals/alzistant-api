@@ -1,7 +1,8 @@
-export const ADMIN = "admin";
 export const USER = "user";
-export const SUPER_ADMIN = "superadmin";
-export const ROLES = [ADMIN, USER, SUPER_ADMIN];
+
+export const CARETAKER = "caretaker";
+
+export const ROLES = [USER, CARETAKER];
 
 export const SUCCESS = {
     USER_ADDED: "User added successfully",

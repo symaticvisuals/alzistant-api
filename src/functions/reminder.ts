@@ -1,3 +1,4 @@
+import e from "express";
 import { IPillReminder, PillReminder } from "../schema/pillReminder";
 import { classResponse } from "../utils/utils";
 import { findPatientId } from "./user";
@@ -36,6 +37,7 @@ const createReminder = async (caretakerId: string, patientId: string, reminder: 
 const findRemidners = async (email: string) => {
     const user = await findPatientId(email);
     const now = moment();
+    console.log("user", user)
     const findRemidners = PillReminder.find({
         user: user.data.patientId,
         endDate: { $gte: now.toDate() }
@@ -66,16 +68,32 @@ const findRemidners = async (email: string) => {
 
 
 
-const getRemindersToTake = async (email: string) => {
+const fetchReminders = async (role: string, email: string, id: string) => {
+    if (role === "caretaker") {
+        const user = await findPatientId(email);
+        const now = moment();
+        const findRemidners = await PillReminder.find({
+            user: user.data.patientId,
+            endDate: { $gte: now.toDate() }
+        });
+        return findRemidners // Await the query execution
+    } else {
+        const now = moment();
+        const findRemidners = await PillReminder.find({
+            user: id,
+            endDate: { $gte: now.toDate() }
+        });
 
-    const user = await findPatientId(email);
+        return findRemidners // Await the query execution
+    }
+}
+
+
+const getRemindersToTake = async (email: string, role: string, id: string) => {
     const now = moment();
-    const findRemidners = PillReminder.find({
-        user: user.data.patientId,
-        endDate: { $gte: now.toDate() }
-    });
 
-    const reminders = await findRemidners.exec(); // Await the query execution
+
+    const reminders = await fetchReminders(role, email, id)// Await the query execution
     if (reminders.length === 0) {
         return classResponse(false, null, 'No reminders found');
     }

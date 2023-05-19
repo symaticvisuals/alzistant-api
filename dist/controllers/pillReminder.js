@@ -41,7 +41,7 @@ exports.create = (0, utils_1.asyncMiddleware)((req, res, next) => __awaiter(void
 exports.getByUserId = (0, utils_1.asyncMiddleware)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const user = req.user;
     try {
-        const categorize = yield (0, reminder_1.getRemindersToTake)(user.email);
+        const categorize = yield (0, reminder_1.getRemindersToTake)(user.email, user.role, user.id);
         return (0, utils_1.sendResponse)(res, {
             status: 200,
             success: categorize.success,

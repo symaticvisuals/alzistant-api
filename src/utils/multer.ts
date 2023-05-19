@@ -16,6 +16,7 @@ interface UploadedPhoto {
 interface FileUploadResult {
     photo: UploadedPhoto;
     name: string;
+    relationship: string;
 }
 
 const handleFileUpload = (req: any, res: Response): Promise<FileUploadResult> => {
@@ -28,16 +29,18 @@ const handleFileUpload = (req: any, res: Response): Promise<FileUploadResult> =>
                     success: false,
                     data: null,
                     error: err
-                })
+                });
                 reject(err);
             } else {
                 const photo = req.file as UploadedPhoto;
                 const name = req.body.name as string;
-                resolve({ photo, name });
+                const relationship = req.body.relationship as string;
+                resolve({ photo, name, relationship });
             }
         });
     });
 };
+
 
 export {
     upload,

@@ -75,15 +75,28 @@ const findNumberOfPatients = async (email: string) => {
 
 const findPatientId = async (email: string) => {
     let findUser = await User.findOne({ email }).populate('patients').exec();
+    console.log(findUser.patients, 'findUser');
+    try {
+        return classResponse(true, {
+            patientId: findUser.patients[0].id,
+            caretakerId: findUser.id
+        }, null);
+    } catch (err) {
+        return classResponse(false, null, 'User not found');
+    }
+}
 
 
-    return classResponse(true, {
-        patientId: findUser.patients[0].id,
-        caretakerId: findUser.id
-    }, null);
+
+const fetchPatientDetailsByUserEmail = async (email: string) => {
+    let findUser = await User.findOne({ email }).populate('patients').exec();
+    if (!findUser || findUser.patients.length === 0) {
+        return classResponse(false, null, 'User not found');
+    }
+    return classResponse(true, findUser, null);
 }
 
 
 
 
-export { create, createUserPatient, addpatientIdToUser, syncUserData, findNumberOfPatients, findPatientId };
+export { create, createUserPatient, addpatientIdToUser, syncUserData, findNumberOfPatients, findPatientId, fetchPatientDetailsByUserEmail };

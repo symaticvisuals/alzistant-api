@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.findPatientId = exports.findNumberOfPatients = exports.syncUserData = exports.addpatientIdToUser = exports.createUserPatient = exports.create = void 0;
+exports.fetchPatientDetailsByUserEmail = exports.findPatientId = exports.findNumberOfPatients = exports.syncUserData = exports.addpatientIdToUser = exports.createUserPatient = exports.create = void 0;
 const user_1 = require("../schema/user");
 const utils_1 = require("../utils/utils");
 const create = (user, phoneNumber) => __awaiter(void 0, void 0, void 0, function* () {
@@ -73,9 +73,23 @@ const findNumberOfPatients = (email) => __awaiter(void 0, void 0, void 0, functi
 exports.findNumberOfPatients = findNumberOfPatients;
 const findPatientId = (email) => __awaiter(void 0, void 0, void 0, function* () {
     let findUser = yield user_1.User.findOne({ email }).populate('patients').exec();
-    return (0, utils_1.classResponse)(true, {
-        patientId: findUser.patients[0].id,
-        caretakerId: findUser.id
-    }, null);
+    console.log(findUser.patients, 'findUser');
+    try {
+        return (0, utils_1.classResponse)(true, {
+            patientId: findUser.patients[0].id,
+            caretakerId: findUser.id
+        }, null);
+    }
+    catch (err) {
+        return (0, utils_1.classResponse)(false, null, 'User not found');
+    }
 });
 exports.findPatientId = findPatientId;
+const fetchPatientDetailsByUserEmail = (email) => __awaiter(void 0, void 0, void 0, function* () {
+    let findUser = yield user_1.User.findOne({ email }).populate('patients').exec();
+    if (!findUser || findUser.patients.length === 0) {
+        return (0, utils_1.classResponse)(false, null, 'User not found');
+    }
+    return (0, utils_1.classResponse)(true, findUser, null);
+});
+exports.fetchPatientDetailsByUserEmail = fetchPatientDetailsByUserEmail;

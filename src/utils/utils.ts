@@ -35,7 +35,7 @@ const generateJwtToken = (payload: any) => {
 };
 
 const verifyJwtToken = async (req: any, res: any, next: any): Promise<any> => {
-  
+
     try {
         if (!req.headers.authorization) {
             return res.status(401).json({
@@ -46,11 +46,11 @@ const verifyJwtToken = async (req: any, res: any, next: any): Promise<any> => {
         }
         const token = req.headers.authorization.split(" ")[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET!);
-  
+
         req.user = decoded;
         next();
     } catch (err) {
-  
+
         return res.status(401).json({
             success: false,
             data: null,
@@ -59,7 +59,7 @@ const verifyJwtToken = async (req: any, res: any, next: any): Promise<any> => {
     }
 };
 
-const verifyRoles = async (req: any, res: any, next: any): Promise<any> => {
+const verifyCaretakerRole = async (req: any, res: any, next: any): Promise<any> => {
     if (!req.user) {
         return res.status(401).json({
             success: false,
@@ -67,7 +67,7 @@ const verifyRoles = async (req: any, res: any, next: any): Promise<any> => {
             error: Constants.UNAUTHORIZED,
         });
     }
-    if (req.user.roles.includes(Constants.ADMIN)) {
+    if (req.user.role === Constants.CARETAKER) {
         next();
     } else {
         return res.status(403).json({
@@ -77,6 +77,26 @@ const verifyRoles = async (req: any, res: any, next: any): Promise<any> => {
         });
     }
 };
+
+const verifyUserRole = async (req: any, res: any, next: any): Promise<any> => {
+    if (!req.user) {
+        return res.status(401).json({
+            success: false,
+            data: null,
+            error: Constants.UNAUTHORIZED,
+        });
+    }
+    if (req.user.role === Constants.USER) {
+        next();
+    } else {
+        return res.status(403).json({
+            success: false,
+            data: null,
+            error: "Forbidden",
+        });
+    }
+};
+
 
 interface SendResponseOptions {
     status: number;
@@ -133,7 +153,8 @@ export {
     getMessageBody,
     errorHandler,
     sendResponse,
-    verifyRoles,
+    verifyCaretakerRole,
+    verifyUserRole,
     verifyJwtToken,
     generateJwtToken,
     asyncMiddleware,

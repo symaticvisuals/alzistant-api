@@ -66,6 +66,7 @@ exports.login = (0, utils_1.asyncMiddleware)((req, res, next) => __awaiter(void 
     }
 }));
 exports.sendOtp = (0, utils_1.asyncMiddleware)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("here");
     const { phoneNumber } = req.body;
     try {
         const send = yield (0, redis_1.generateOTP)(phoneNumber);
