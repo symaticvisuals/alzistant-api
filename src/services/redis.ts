@@ -12,7 +12,7 @@ async function generateOTP(phoneNumber: string): Promise<string> {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
     // Store OTP in Redis with a TTL of 5 minutes
-    if (phoneNumber === '8810421579') {
+    if (phoneNumber === '1234567890') {
         await redis.set(`otp:${phoneNumber}`, '123456', "EX", 300);
         return '123456'
     }
