@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { RequestHandler } from 'express-serve-static-core';
 import { verifyJwtToken } from '../../utils/utils';
-import { createPatient, findPatientsCount } from '../../controllers/user';
+import { createPatient, findCaretakerByPatientEmail, findPatientsCount } from '../../controllers/user';
 
 const router = Router();
 
@@ -10,6 +10,9 @@ router.route('/add-patient')
 
 router.route('/find-patients-count')
     .get(verifyJwtToken, findPatientsCount as RequestHandler)
+
+router.route('/caretaker')
+    .get(verifyJwtToken, findCaretakerByPatientEmail as RequestHandler)
 
 
 

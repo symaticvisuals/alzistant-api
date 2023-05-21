@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.findPatientsCount = exports.createPatient = void 0;
+exports.findCaretakerByPatientEmail = exports.findPatientsCount = exports.createPatient = void 0;
 const utils_1 = require("../utils/utils");
 const utils_2 = require("../utils/utils");
 const user_1 = require("../functions/user");
@@ -25,6 +25,7 @@ exports.createPatient = (0, utils_2.asyncMiddleware)((req, res, next) => __await
                 message: 'User Already Exists'
             });
         }
+        console.log("REQUEST.USER>>>>", req.user.email);
         const addtoUser = yield (0, user_1.addpatientIdToUser)(req.user.email, response.data._id);
         if (!addtoUser.success) {
             return (0, utils_1.sendResponse)(res, {
@@ -62,6 +63,29 @@ exports.findPatientsCount = (0, utils_2.asyncMiddleware)((req, res, next) => __a
             status: 200,
             data: findNumer.data,
             message: 'Patients Found'
+        });
+    }
+    catch (err) {
+        next(err);
+    }
+}));
+exports.findCaretakerByPatientEmail = (0, utils_2.asyncMiddleware)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    let { email } = req.user;
+    try {
+        let findCareTaker = yield (0, user_1.findCaretaker)(email);
+        if (!findCareTaker.data) {
+            return (0, utils_1.sendResponse)(res, {
+                success: false,
+                status: 200,
+                data: null,
+                message: 'No Caretaker Found'
+            });
+        }
+        return (0, utils_1.sendResponse)(res, {
+            success: true,
+            status: 200,
+            data: findCareTaker.data,
+            message: 'Caretaker Found'
         });
     }
     catch (err) {

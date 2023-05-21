@@ -103,7 +103,8 @@ exports.storeRelativeImage = storeRelativeImage;
 const findRelativeById = (id) => __awaiter(void 0, void 0, void 0, function* () {
     console.log('Finding relative by ID:', id);
     try {
-        const relative = yield relative_1.Relative.findOne({ patientId: id }).select('patientId');
+        const relative = yield relative_1.Relative.findOne({ _id: id });
+        console.log('Relative found>>>>>>>>>>>>:', relative);
         if (relative) {
             return relative;
         }
@@ -150,7 +151,7 @@ exports.verifyImage = (0, utils_1.asyncMiddleware)((req, res, next) => __awaiter
         personDetails = JSON.parse(personDetails);
         if ((personDetails === null || personDetails === void 0 ? void 0 : personDetails.id) !== undefined) {
             console.log('Person found in database:', personDetails);
-            const relative = yield findRelativeById(personDetails.patientId);
+            const relative = yield findRelativeById(personDetails.id);
             if (!relative) {
                 console.log('Relative not found');
                 res.status(200).json({ success: false, data: null, error: null });

@@ -13,7 +13,7 @@ export const createUserChat = asyncMiddleware(
             const userChatMessage = await createChat(message, 'user', req.user.email);
 
             // Call the API and store the API chat
-            const apiChatMessage = await createAPIChat(message);
+            const apiChatMessage = await createAPIChat(message, req.user.email);
 
             return sendResponse(res, {
                 success: true,

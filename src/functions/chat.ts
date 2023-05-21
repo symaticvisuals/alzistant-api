@@ -13,23 +13,31 @@ export const createChat = async (message: string, sender: 'user' | 'caretaker' |
     return chatMessage;
 };
 
-export const createAPIChat = async (message: string): Promise<any> => {
-    const response = await axios.post('API_URL', { message }); // Replace 'API_URL' with the actual API endpoint
-
+export const createAPIChat = async (message: string, email: string): Promise<any> => {
+    const response = await axios.post("https://alzistant.pagekite.me/webhooks/rest/webhook", { sender: email, message }); // Replace 'API_URL' with the actual API endpoint
+    // add a 2 second delay to simulate API response time
+    console.log(response.data);
+    let data = null;
+    if (response.data.length > 1) {
+        data = response.data[1].text;
+    } else {
+        data = response.data[0].text;
+    }
     const chatMessage = new Chat({
-        message: response.data.message,
+        message: data,
         sentAt: moment().tz('Asia/Kolkata').toDate(),
         sender: 'chatbot',
-        userEmail: '', // Set the user email as needed
+        userEmail: email, // Set the user email as needed
     });
     await chatMessage.save();
     return chatMessage;
 };
 
 
+
 export const getAllChats = async (email: string): Promise<any[]> => {
     try {
-        const chats = await Chat.find({ userEmail: email }).sort({ sentAt: -1 }).lean();
+        const chats = await Chat.find({ userEmail: email }).sort({ sentAt: 1 }).lean();
         return chats;
     } catch (error) {
         throw error;

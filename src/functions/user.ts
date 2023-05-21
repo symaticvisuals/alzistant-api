@@ -31,6 +31,7 @@ const addpatientIdToUser = async (email: string, patientId: any) => {
         return classResponse(false, null, 'User not found');
     }
     const user = await findUser.exec();
+    console.log(user, 'user');
     user.patients.push(patientId);
     await user.save();
     return classResponse(true, user, null);
@@ -96,7 +97,35 @@ const fetchPatientDetailsByUserEmail = async (email: string) => {
     return classResponse(true, findUser, null);
 }
 
+const findCaretaker = async (email: string) => {
+    console.log(email, 'email');
+    // I have to find the caretaker of the patient and patient id is mentioned in the user with role caretaker
+    let allUsers = await User.find({}).populate('patients').exec();
+    let caretaker = allUsers.filter((user: any) => {
+        if (user.patients.length > 0) {
+            console.log(user.patients[0].email, 'user.patients[0].email');
+            return user.patients[0].email === email;
+        }
+    }
+    ).map((user: any) => {
+        return {
+            name: user.name,
+            email: user.email,
+            mobile: user.mobile,
+            picture: user.picture,
+        }
+    });
+    console.log(caretaker, 'caretaker');
+    if (caretaker.length === 0) {
+        return classResponse(false, null, 'User not found');
+    }
+    else {
+        return classResponse(true, caretaker[0], null);
+    }
+
+}
 
 
 
-export { create, createUserPatient, addpatientIdToUser, syncUserData, findNumberOfPatients, findPatientId, fetchPatientDetailsByUserEmail };
+
+export { create, createUserPatient, addpatientIdToUser, syncUserData, findNumberOfPatients, findPatientId, fetchPatientDetailsByUserEmail, findCaretaker };

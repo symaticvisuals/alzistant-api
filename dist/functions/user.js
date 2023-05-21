@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fetchPatientDetailsByUserEmail = exports.findPatientId = exports.findNumberOfPatients = exports.syncUserData = exports.addpatientIdToUser = exports.createUserPatient = exports.create = void 0;
+exports.findCaretaker = exports.fetchPatientDetailsByUserEmail = exports.findPatientId = exports.findNumberOfPatients = exports.syncUserData = exports.addpatientIdToUser = exports.createUserPatient = exports.create = void 0;
 const user_1 = require("../schema/user");
 const utils_1 = require("../utils/utils");
 const create = (user, phoneNumber) => __awaiter(void 0, void 0, void 0, function* () {
@@ -34,6 +34,7 @@ const addpatientIdToUser = (email, patientId) => __awaiter(void 0, void 0, void 
         return (0, utils_1.classResponse)(false, null, 'User not found');
     }
     const user = yield findUser.exec();
+    console.log(user, 'user');
     user.patients.push(patientId);
     yield user.save();
     return (0, utils_1.classResponse)(true, user, null);
@@ -93,3 +94,29 @@ const fetchPatientDetailsByUserEmail = (email) => __awaiter(void 0, void 0, void
     return (0, utils_1.classResponse)(true, findUser, null);
 });
 exports.fetchPatientDetailsByUserEmail = fetchPatientDetailsByUserEmail;
+const findCaretaker = (email) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(email, 'email');
+    // I have to find the caretaker of the patient and patient id is mentioned in the user with role caretaker
+    let allUsers = yield user_1.User.find({}).populate('patients').exec();
+    let caretaker = allUsers.filter((user) => {
+        if (user.patients.length > 0) {
+            console.log(user.patients[0].email, 'user.patients[0].email');
+            return user.patients[0].email === email;
+        }
+    }).map((user) => {
+        return {
+            name: user.name,
+            email: user.email,
+            mobile: user.mobile,
+            picture: user.picture,
+        };
+    });
+    console.log(caretaker, 'caretaker');
+    if (caretaker.length === 0) {
+        return (0, utils_1.classResponse)(false, null, 'User not found');
+    }
+    else {
+        return (0, utils_1.classResponse)(true, caretaker[0], null);
+    }
+});
+exports.findCaretaker = findCaretaker;

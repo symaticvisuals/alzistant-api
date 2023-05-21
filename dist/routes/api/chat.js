@@ -2,9 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const utils_1 = require("../../utils/utils");
+const chat_1 = require("../../controllers/chat");
 const router = (0, express_1.Router)();
 router.route('/')
-    .post(utils_1.verifyJwtToken, (req, res) => {
-    res.send('hello');
-});
+    .get(utils_1.verifyJwtToken, chat_1.getUserChats)
+    .post(utils_1.verifyJwtToken, chat_1.createUserChat);
 exports.default = router;

@@ -94,6 +94,7 @@ export const verifyOtp = asyncMiddleware(
         return sendResponse(res, { success: false, message: 'OTP Verification Failed', status: 400 })
       }
       const user = await verifyUser(accessToken);
+      
       const createUser = await create(user, phoneNumber);
       if (!createUser.success) {
         return sendResponse(res, { success: false, message: 'User Creation Failed', status: 400 })

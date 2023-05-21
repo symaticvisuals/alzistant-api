@@ -25,13 +25,11 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.chatSchema = exports.Chat = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
-const profanity_filter_1 = require("profanity-filter");
 // Define the chat schema
 const chatSchema = new mongoose_1.Schema({
-    message: { type: String, required: true },
-    sentAt: { type: Date, required: true },
-    sender: { type: String, enum: ['caretaker', 'user', 'chatbot'], required: true },
-    userEmail: { type: String, required: true },
+    url: { type: String, required: true },
+    userId: { type: String, required: true },
+    caretakerId: { type: String, required: true },
 }, { timestamps: true } // Automatically generates createdAt and updatedAt fields
 );
 exports.chatSchema = chatSchema;
@@ -42,7 +40,7 @@ chatSchema.pre('save', function (next) {
     next();
 });
 function filterChatMessage(message) {
-    const filteredMessage = (0, profanity_filter_1.clean)(message);
+    const filteredMessage = clean(message);
     return filteredMessage;
 }
 // Define the chat model

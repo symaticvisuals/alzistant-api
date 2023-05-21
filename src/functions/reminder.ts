@@ -17,7 +17,6 @@ const createReminder = async (caretakerId: string, patientId: string, reminder: 
         user: patientId,
         timingsMoment,
     };
-
     const reminderData = new PillReminder(reminderObj);
 
     await reminderData.validate();

@@ -1,5 +1,6 @@
 import mongoose, { Schema, Document } from 'mongoose';
-import { filter } from 'profanity-filter';
+import { clean } from 'profanity-filter';
+
 
 // Define the message interface
 interface IMessage extends Document {
@@ -8,6 +9,7 @@ interface IMessage extends Document {
     sender: 'caretaker' | 'user' | 'chatbot';
     userEmail: string;
 }
+
 
 // Define the chat schema
 const chatSchema = new Schema<IMessage>(
@@ -27,9 +29,8 @@ chatSchema.pre<IMessage>('save', function (next) {
     next();
 });
 
-// Filter function to remove explicit words using profanity-filter package
 function filterChatMessage(message: string): string {
-    const filteredMessage = filter.clean(message);
+    const filteredMessage = clean(message);
     return filteredMessage;
 }
 

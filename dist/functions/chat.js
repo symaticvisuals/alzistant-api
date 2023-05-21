@@ -27,13 +27,22 @@ const createChat = (message, sender, userEmail) => __awaiter(void 0, void 0, voi
     return chatMessage;
 });
 exports.createChat = createChat;
-const createAPIChat = (message) => __awaiter(void 0, void 0, void 0, function* () {
-    const response = yield axios_1.default.post('API_URL', { message }); // Replace 'API_URL' with the actual API endpoint
+const createAPIChat = (message, email) => __awaiter(void 0, void 0, void 0, function* () {
+    const response = yield axios_1.default.post("https://alzistant.pagekite.me/webhooks/rest/webhook", { sender: email, message }); // Replace 'API_URL' with the actual API endpoint
+    // add a 2 second delay to simulate API response time
+    console.log(response.data);
+    let data = null;
+    if (response.data.length > 1) {
+        data = response.data[1].text;
+    }
+    else {
+        data = response.data[0].text;
+    }
     const chatMessage = new chat_1.Chat({
-        message: response.data.message,
+        message: data,
         sentAt: (0, moment_timezone_1.default)().tz('Asia/Kolkata').toDate(),
         sender: 'chatbot',
-        userEmail: '', // Set the user email as needed
+        userEmail: email, // Set the user email as needed
     });
     yield chatMessage.save();
     return chatMessage;
@@ -41,7 +50,7 @@ const createAPIChat = (message) => __awaiter(void 0, void 0, void 0, function* (
 exports.createAPIChat = createAPIChat;
 const getAllChats = (email) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const chats = yield chat_1.Chat.find({ userEmail: email }).sort({ sentAt: -1 }).lean();
+        const chats = yield chat_1.Chat.find({ userEmail: email }).sort({ sentAt: 1 }).lean();
         return chats;
     }
     catch (error) {

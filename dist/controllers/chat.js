@@ -19,7 +19,7 @@ exports.createUserChat = (0, utils_2.asyncMiddleware)((req, res, next) => __awai
         // Store the user chat
         const userChatMessage = yield (0, chat_1.createChat)(message, 'user', req.user.email);
         // Call the API and store the API chat
-        const apiChatMessage = yield (0, chat_1.createAPIChat)(message);
+        const apiChatMessage = yield (0, chat_1.createAPIChat)(message, req.user.email);
         return (0, utils_1.sendResponse)(res, {
             success: true,
             status: 200,
