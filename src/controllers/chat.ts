@@ -2,7 +2,8 @@ import { sendResponse } from "../utils/utils";
 import { Request, Response, NextFunction } from "express";
 import { asyncMiddleware } from "../utils/utils";
 
-import { createAPIChat, createChat, getAllChats } from "../functions/chat";
+import { createAPIChat, createChat, getAllChats, getPatientChatsByCareTaker } from "../functions/chat";
+import { fetchPatientDetailsByUserEmail } from "../functions/user";
 
 export const createUserChat = asyncMiddleware(
     async (req: any, res: Response, next: NextFunction) => {
@@ -32,8 +33,11 @@ export const createCareTakerChat = asyncMiddleware(
     async (req: any, res: Response, next: NextFunction) => {
         try {
             const { message } = req.body;
-
-            const careTakerChatMessage = await createChat(message, 'caretaker', req.user.email);
+            const { email } = req.user;
+            // find the patient email from the careTaker email 
+            const findPatientDetails = await fetchPatientDetailsByUserEmail(email);
+            const patientEmail = findPatientDetails.data.patients[0].email;
+            const careTakerChatMessage = await createChat(message, 'caretaker', patientEmail);
 
             return sendResponse(res, {
                 success: true,
@@ -66,3 +70,23 @@ export const getUserChats = asyncMiddleware(
         }
     }
 );
+
+export const getCareTakerChats = asyncMiddleware(
+    async (req: any, res: Response, next: NextFunction) => {
+        try {
+            const { email } = req.user;
+            console.log(email, 'email');
+            const patientChats = await getPatientChatsByCareTaker(email);
+            return sendResponse(res, {
+                success: true,
+                status: 200,
+                data: patientChats.data,
+                message: 'CareTaker chats fetched successfully'
+            });
+        } catch (error) {
+            next(error);
+
+        }
+    }
+);
+

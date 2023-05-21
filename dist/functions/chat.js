@@ -12,10 +12,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllChats = exports.createAPIChat = exports.createChat = void 0;
+exports.getPatientChatsByCareTaker = exports.getAllChats = exports.createAPIChat = exports.createChat = void 0;
 const chat_1 = require("../schema/chat");
 const axios_1 = __importDefault(require("axios"));
 const moment_timezone_1 = __importDefault(require("moment-timezone"));
+const utils_1 = require("../utils/utils");
+const user_1 = require("./user");
 const createChat = (message, sender, userEmail) => __awaiter(void 0, void 0, void 0, function* () {
     const chatMessage = new chat_1.Chat({
         message,
@@ -58,3 +60,18 @@ const getAllChats = (email) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.getAllChats = getAllChats;
+const getPatientChatsByCareTaker = (email) => __awaiter(void 0, void 0, void 0, function* () {
+    // find the patient email from the careTaker email
+    try {
+        console.log(email, 'email');
+        const findPatientDetails = (0, user_1.fetchPatientDetailsByUserEmail)(email);
+        const patientDetails = yield findPatientDetails;
+        const patientEmail = patientDetails.data.patients[0].email;
+        const chats = yield (0, exports.getAllChats)(patientEmail);
+        return (0, utils_1.classResponse)(true, chats, null);
+    }
+    catch (error) {
+        return (0, utils_1.classResponse)(false, null, 'User not found');
+    }
+});
+exports.getPatientChatsByCareTaker = getPatientChatsByCareTaker;

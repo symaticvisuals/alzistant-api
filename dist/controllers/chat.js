@@ -9,10 +9,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getUserChats = exports.createCareTakerChat = exports.createUserChat = void 0;
+exports.getCareTakerChats = exports.getUserChats = exports.createCareTakerChat = exports.createUserChat = void 0;
 const utils_1 = require("../utils/utils");
 const utils_2 = require("../utils/utils");
 const chat_1 = require("../functions/chat");
+const user_1 = require("../functions/user");
 exports.createUserChat = (0, utils_2.asyncMiddleware)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { message } = req.body;
@@ -34,7 +35,11 @@ exports.createUserChat = (0, utils_2.asyncMiddleware)((req, res, next) => __awai
 exports.createCareTakerChat = (0, utils_2.asyncMiddleware)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { message } = req.body;
-        const careTakerChatMessage = yield (0, chat_1.createChat)(message, 'caretaker', req.user.email);
+        const { email } = req.user;
+        // find the patient email from the careTaker email 
+        const findPatientDetails = yield (0, user_1.fetchPatientDetailsByUserEmail)(email);
+        const patientEmail = findPatientDetails.data.patients[0].email;
+        const careTakerChatMessage = yield (0, chat_1.createChat)(message, 'caretaker', patientEmail);
         return (0, utils_1.sendResponse)(res, {
             success: true,
             status: 200,
@@ -55,6 +60,22 @@ exports.getUserChats = (0, utils_2.asyncMiddleware)((req, res, next) => __awaite
             status: 200,
             data: userChats,
             message: 'User chats fetched successfully'
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+}));
+exports.getCareTakerChats = (0, utils_2.asyncMiddleware)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { email } = req.user;
+        console.log(email, 'email');
+        const patientChats = yield (0, chat_1.getPatientChatsByCareTaker)(email);
+        return (0, utils_1.sendResponse)(res, {
+            success: true,
+            status: 200,
+            data: patientChats.data,
+            message: 'CareTaker chats fetched successfully'
         });
     }
     catch (error) {

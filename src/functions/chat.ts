@@ -1,6 +1,9 @@
 import { Chat } from '../schema/chat';
 import axios from 'axios';
 import moment from 'moment-timezone';
+import { User } from '../schema/user';
+import { classResponse } from '../utils/utils';
+import { fetchPatientDetailsByUserEmail } from './user';
 
 export const createChat = async (message: string, sender: 'user' | 'caretaker' | 'chatbot', userEmail: string): Promise<any> => {
     const chatMessage = new Chat({
@@ -43,3 +46,20 @@ export const getAllChats = async (email: string): Promise<any[]> => {
         throw error;
     }
 };
+
+
+export const getPatientChatsByCareTaker = async (email: string): Promise<any> => {
+    // find the patient email from the careTaker email
+    try {
+        console.log(email, 'email');
+        const findPatientDetails = fetchPatientDetailsByUserEmail(email);
+        const patientDetails = await findPatientDetails;
+        const patientEmail = patientDetails.data.patients[0].email;
+
+        const chats = await getAllChats(patientEmail);
+        return classResponse(true, chats, null);
+    } catch (error) {
+        return classResponse(false, null, 'User not found');
+    }
+
+}

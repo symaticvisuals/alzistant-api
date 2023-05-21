@@ -7,4 +7,8 @@ const router = (0, express_1.Router)();
 router.route('/')
     .get(utils_1.verifyJwtToken, chat_1.getUserChats)
     .post(utils_1.verifyJwtToken, chat_1.createUserChat);
+router.route('/caretaker')
+    .post(utils_1.verifyJwtToken, chat_1.createCareTakerChat);
+router.route('/patient')
+    .get(utils_1.verifyJwtToken, chat_1.getCareTakerChats);
 exports.default = router;
