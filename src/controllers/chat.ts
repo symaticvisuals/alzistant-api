@@ -8,7 +8,6 @@ export const createUserChat = asyncMiddleware(
     async (req: any, res: Response, next: NextFunction) => {
         try {
             const { message } = req.body;
-
             // Store the user chat
             const userChatMessage = await createChat(message, 'user', req.user.email);
 
