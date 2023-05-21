@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateIsTaken = exports.getByUserId = exports.create = void 0;
+exports.updateIsTaken = exports.updateReminder = exports.deleteReminderById = exports.getAll = exports.getByUserId = exports.create = void 0;
 const moment_timezone_1 = __importDefault(require("moment-timezone"));
 const reminder_1 = require("../functions/reminder");
 const user_1 = require("../functions/user");
@@ -47,6 +47,66 @@ exports.getByUserId = (0, utils_1.asyncMiddleware)((req, res, next) => __awaiter
             success: categorize.success,
             data: categorize.data,
             error: categorize.err
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+}));
+exports.getAll = (0, utils_1.asyncMiddleware)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = req.user;
+    try {
+        const caretakerId = (yield (0, user_1.findPatientId)(user.email)).data.caretakerId;
+        const findReminders = yield pillReminder_1.PillReminder.find({ caretakerId: caretakerId }).exec();
+        (0, utils_1.sendResponse)(res, {
+            status: 200,
+            success: true,
+            data: findReminders,
+            error: null
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+}));
+exports.deleteReminderById = (0, utils_1.asyncMiddleware)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    console.log(id);
+    try {
+        const deleteReminder = yield pillReminder_1.PillReminder.deleteOne({ _id: id });
+        return (0, utils_1.sendResponse)(res, {
+            status: 200,
+            success: true,
+            data: deleteReminder,
+            error: null
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+}));
+exports.updateReminder = (0, utils_1.asyncMiddleware)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const updates = req.body;
+    try {
+        const reminder = yield pillReminder_1.PillReminder.findOne({ _id: id });
+        if (!reminder) {
+            return (0, utils_1.sendResponse)(res, {
+                status: 404,
+                success: false,
+                data: null,
+                error: 'Reminder not found'
+            });
+        }
+        Object.keys(updates).forEach((key) => {
+            reminder[key] = updates[key];
+        });
+        const updatedReminder = yield reminder.save();
+        return (0, utils_1.sendResponse)(res, {
+            status: 200,
+            success: true,
+            data: updatedReminder,
+            error: null
         });
     }
     catch (error) {

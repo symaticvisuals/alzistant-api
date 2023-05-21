@@ -4,7 +4,7 @@ import { createReminder, findRemidners, getRemindersToTake } from "../functions/
 import { findPatientId } from "../functions/user";
 import { asyncMiddleware, sendResponse } from "../utils/utils";
 import { Response, NextFunction } from "express";
-import { IPillReminder, PillReminder } from "../schema/pillReminder";
+import { IPillReminder, PillReminder, pillReminderSchema } from "../schema/pillReminder";
 
 export const create = asyncMiddleware(async (req: any, res: Response, next: NextFunction) => {
     let user = req.user;
@@ -47,6 +47,79 @@ export const getByUserId = asyncMiddleware(async (req: any, res: Response, next:
     }
 })
 
+
+export const getAll = asyncMiddleware(async (req: any, res: Response, next: NextFunction) => {
+    const user = req.user;
+    try {
+        const caretakerId = (await findPatientId(user.email)).data.caretakerId;
+        const findReminders = await PillReminder.find({ caretakerId: caretakerId }).exec();
+
+        sendResponse(res, {
+            status: 200,
+            success: true,
+            data: findReminders,
+            error: null
+        })
+    } catch (error) {
+        next(error);
+    }
+
+})
+
+
+export const deleteReminderById = asyncMiddleware(async (req: any, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    console.log(id);
+    try {
+        const deleteReminder = await PillReminder.deleteOne({ _id: id });
+        return sendResponse(res, {
+            status: 200,
+            success: true,
+            data: deleteReminder,
+            error: null
+        })
+    } catch (error) {
+        next(error);
+    }
+})
+
+
+export const updateReminder = asyncMiddleware(async (req: any, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    const updates = req.body;
+
+    try {
+        const reminder = await PillReminder.findOne({ _id: id });
+        if (!reminder) {
+            return sendResponse(res, {
+                status: 404,
+                success: false,
+                data: null,
+                error: 'Reminder not found'
+            });
+        }
+
+        Object.keys(updates).forEach((key) => {
+            reminder[key] = updates[key];
+        });
+
+        const updatedReminder = await reminder.save();
+        return sendResponse(res, {
+            status: 200,
+            success: true,
+            data: updatedReminder,
+            error: null
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
+
+
+
+
+
 export const updateIsTaken = asyncMiddleware(async (req: any, res: Response, next: NextFunction) => {
     const { reminderId, timingId } = req.body;
     try {
@@ -82,3 +155,4 @@ export const updateIsTaken = asyncMiddleware(async (req: any, res: Response, nex
         next(error);
     }
 })
+
